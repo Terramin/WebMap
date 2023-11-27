@@ -1,18 +1,18 @@
 var myMap; // Объявляем переменную для карты
-var Dormitory = false;
+var Dormitory = false;// Необходимо для проверки активности корпусов/Общежитий
 var Pavilion = false;
 var Main = false;
 var control;
-var center_position = [47.23723507426487,39.712281999999966];
+var center_position = [47.23723507426487,39.712281999999966];// Расположение основной метки с координатами lat lon
 /*var markerss = [];*/
 var markers = [
 	{
-		name: 'РОСТОВ-НА-ДОНУ, ПЛОЩАДЬ ГАГАРИН',
-		coordinates: [47.23723507426487, 39.712281999999966], // Координаты метки (например, Москва)
-		address:'РОСТОВ-НА-ДОНУ, ПЛОЩАДЬ ГАГАРИН, 1',
-		description: 'Это место находится по адресу: РОСТОВ-НА-ДОНУ, ПЛОЩАДЬ ГАГАРИНА, 1',
-		mark_id:0,
-		type: 0
+		name: 'РОСТОВ-НА-ДОНУ, ПЛОЩАДЬ ГАГАРИН',// Имя метки
+		coordinates: [47.23723507426487, 39.712281999999966], // Координаты метки
+		address:'РОСТОВ-НА-ДОНУ, ПЛОЩАДЬ ГАГАРИН, 1',//Адрес(Аналог координат) необходим для некоторых функций
+		description: 'Это место находится по адресу: РОСТОВ-НА-ДОНУ, ПЛОЩАДЬ ГАГАРИНА, 1',// Описание с возможностью использования Html тегов
+		mark_id:0, //Primary Key Id для возможности определения меток
+		type: 0 // Определение типа меток
 	},
 	{
 		name: 'Общежитие №1',
@@ -176,11 +176,13 @@ var markers = [
 	}
 ];
 
+/*Временно неиспользуемая функция*/
 function placemark_list(placemarkmark_id) {
 
 	myMap.setCenter(markers[placemarkmark_id].coordinates, 17);
 		console.log(placemarkmark_id);
 }
+/*Временно неиспользуемая функция*/
 function Navigation(placemark_id) {
 	if (!control) {
 		control = new ymaps.control.RoutePanel({
@@ -205,6 +207,7 @@ function Navigation(placemark_id) {
 }
 
 ymaps.ready(function () {
+	/*Перезапись в глабальную переменную myMap (Создание карты при запуске странице с Центром и Увеличением)*/
 	myMap = new ymaps.Map('map', {
 		center: center_position,
 		zoom: 15
@@ -225,74 +228,93 @@ ymaps.ready(function () {
 		}
 		markerss = []; // Очистите массив меток
 	}
+
+	Я не помню зачем я это оставил но пусть будет
 */
 	function showNavigation() {
+		/*Функция показа для панели навигации*/
 		if (!control) {
+			/*Если глобальная переменная control не имеет данных то происходит запись данных для ymap RoutePanel(Левое расположение и максимальной высотой 100px(можно использовать относительные значения но не желательно))*/
 			control = new ymaps.control.RoutePanel({
 				options: {
 					float: 'left',
 					maxWidth: '100px'
 				}
 			});
+			/*Обновление(Установка/SET) статистики control.routePanel с типом masstransit(Пешая ходьба, автобус и такси)*/
 			control.routePanel.state.set({
 				type: 'masstransit',
-				fromEnabled: true,
+				fromEnabled: true, /*Возможность редактировать поле откуда*/
 				from: '',
-				toEnabled: false,
+				toEnabled: false,/*Отключение возможности взаимодействия пользователя с полем(Куда) и установка направления на адрес(с помощью функции можно допилить получение адресса из lat lon но я рот ебал)*/
 				to: 'РОСТОВ-НА-ДОНУ, ПЛОЩАДЬ ГАГАРИНА, 1'
 			});
 
-			myMap.controls.add(control);
+			myMap.controls.add(control);/*Инициализация самой понели controls к глобальной переменной myMap(Наша карта)*/
 		}else {
 			myMap.controls.remove(control);
 			control = null;
+			/*Функция удаления панели и очистка переменной*/
 		}
 	}
 
 	// Назначаем обработчик события на кнопку
 	document.getElementById('showNavigation').addEventListener('click', showNavigation);
 	var Main_clusterer = new ymaps.GeoObjectCollection();
+
+
 	document.getElementById('showMain').addEventListener('click', function () {
+		/*Поиск по сайту элементов с id showMain и запуск обработчика прослушки проверки нажатия на элемент*/
+		/*Проверка Переменной на наличие в ней False*/
 		if(Main===false) {
+			/*Создание локальной переменной в этой функции placemark(Метка на карте) со значениями Имени и Описания*/
 			var placemark = new ymaps.Placemark(markers[0].coordinates, {
 				hintContent: markers[0].name,
 				balloonContent: markers[0].description
 			});
+			/*Добавление метки в кластер*/
 			Main_clusterer.add(placemark);
+			/*Добавление кластера на карту*/
 			myMap.geoObjects.add(Main_clusterer);
+			/*Обновление позиции карты на координаты полученные из массива и размер 15*/
 			myMap.setCenter(markers[0].coordinates, 15);
+			/*Обновление переменной Main*/
 			Main=true;
 		}else{
 			myMap.geoObjects.remove(Main_clusterer);
 			Main=false;
+			/*Удаление геометок с карты и обновление переменной для возможности использования как переключатель*/
 		}
 	});
-	var Pavilion_clusterer = new ymaps.GeoObjectCollection();
+
+	var Pavilion_clusterer = new ymaps.GeoObjectCollection();/*Еще одно переменная на уровень выше чем функция(Будет глобальной для следующей функции но не глобальной для файла)*/
 	document.getElementById('showPavilion').addEventListener('click', function () {
-		if (Pavilion===false) {
-			for (var i = 0; i < markers.length; i++){
-				if (markers[i].type===2) {
-					var placemark = new ymaps.Placemark(markers[i].coordinates, {
+		if (Pavilion===false) {/*Проверка состояния переменной Pavilion*/
+			for (var i = 0; i < markers.length; i++){/*Запуск цикла и созданее локальной переменной и равной 0. Если i меньше длины значений массива markers, то будет происходить увеличение на 1 пока не будет больше(или равно если так поставить но нам нужно больше)*/
+				if (markers[i].type===2) {/*Проверка на тип, чтобы проходили только данные с типом 2*/
+					var placemark = new ymaps.Placemark(markers[i].coordinates, {/*Создание маркера с именем и описанием*/
 						hintContent: markers[i].name,
 						balloonContent: markers[i].description
 					});
 
-					Pavilion_clusterer.add(placemark);
+					Pavilion_clusterer.add(placemark);/*каждый цикл добавляет возможные метки в кластер который мы указали на уровень выше*/
 					document.getElementById('content1').innerHTML += "<div class='card2' id='pavilion'><p class=\"button\" id=\"placemark_list\" onclick='placemark_list("+markers[i].mark_id+");'>Перейти к: "+markers[i].name+"          Mark_id:"+markers[i].mark_id+"</p><p class=\"button\" onclick='Navigation("+markers[i].mark_id+");'>Навигация</p><h1>"+markers[i].name+"</h1><p>"+markers[i].description+"</p></div>";
+				/*Изменение элемента по Ид с заменой на Html*/
 				}
 			}
 
 			myMap.geoObjects.add(Pavilion_clusterer);
-			Pavilion = true;
+			Pavilion = true;/*Добавление всех данных из кластера как группу меток и обновление состояния переменной*/
 		}else{
 			myMap.geoObjects.remove(Pavilion_clusterer);/*
 			document.getElementById('content1').innerHTML = "";*/
-			const pavilionDivs = document.querySelectorAll('#pavilion');
-			pavilionDivs.forEach(div => div.remove());
-			Pavilion = false;
+			/*Удаление гео меток*/
+			const pavilionDivs = document.querySelectorAll('#pavilion');/*Создание переменной с провереным наличием всех Html обьектов с ИД pavilion*/
+			pavilionDivs.forEach(div => div.remove());/*Функция pavilionDivs выбирает все элементы с идентификатором "pavilion" и сохраняет их в переменной pavilionDivs. Затем, с помощью метода forEach, функция выполняет заданную функцию для каждого элемента в pavilionDivs. В данном случае, функция удаляет каждый элемент из HTML-документа с помощью метода remove().*/
+			Pavilion = false;/*Обновление переменной*/
 		}
 	});
-
+/*ТОже самая функции но только для другой кнопки(Описание смотреть выше)*/
 	var Dormitory_clusterer = new ymaps.GeoObjectCollection();
 	document.getElementById('showDormitory').addEventListener('click', function () {
 		if (Dormitory===false) {

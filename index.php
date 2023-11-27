@@ -6,7 +6,7 @@
     <title>Яндекс Карта</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1" />
   <link rel="shortcut icon" href="image/favicon-b.png" type="image/x-icon">
-	<link rel="stylesheet" href="css/jkhkjhkjh.css">
+	<link rel="stylesheet" href="css/css.css">
     <!--
 	 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=361f015e-cb45-4f23-9fd0-07c0a8c70a19" type="text/javascript"></script>-->
     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=5950e78e-f42b-4780-bb84-91bead5beddc" type="text/javascript"></script>
@@ -14,7 +14,7 @@
 
     <script type="text/javascript">
 
-        window.onload = function() {
+        window.onload = function() {/* При загрузке окна устанавливает задержку загрузки+800мс для полной загрузки всех скриптов*/
 
             setTimeout(function() {
 
